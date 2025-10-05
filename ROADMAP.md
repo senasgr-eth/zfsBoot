@@ -52,18 +52,20 @@ This document outlines the development roadmap for NSBoot v4.1 and beyond.
 
 ## Phase 2: Performance & Scalability (Weeks 8-14)
 
-### 🚧 In Progress
+### ✅ Completed
 - [x] Dockerfile optimization
 - [x] Docker Compose configuration
 - [x] ZFS tuning scripts
 - [x] Performance benchmark scripts
+- [x] Kubernetes Helm chart
+  - [x] Deployment templates
+  - [x] PersistentVolumeClaims for ZFS
+  - [x] Service and Ingress
+  - [x] ConfigMaps and Secrets
 
 ### 📋 Pending
-- [ ] Kubernetes Helm chart
-  - [ ] StatefulSet for NSBoot server
-  - [ ] PersistentVolumeClaims for ZFS
-  - [ ] Service mesh integration
-  - [ ] Horizontal pod autoscaling
+- [ ] Service mesh integration
+- [ ] Horizontal pod autoscaling
 - [ ] ZFS optimization
   - [ ] L2ARC cache implementation
   - [ ] ZIL optimization
@@ -144,17 +146,20 @@ This document outlines the development roadmap for NSBoot v4.1 and beyond.
 - [x] Prometheus monitoring setup
 - [x] MkDocs documentation structure
 
+### ✅ Completed
+- [x] Monitoring & Observability
+  - [x] Grafana dashboards
+  - [x] Custom ZFS metrics
+  - [x] Prometheus configuration
+
 ### 📋 Pending
 - [ ] CI/CD enhancements
   - [ ] Automated testing
   - [ ] Security scanning (Trivy, Snyk)
   - [ ] Docker Hub auto-publish
   - [ ] GitHub Releases automation
-- [ ] Monitoring & Observability
-  - [ ] Grafana dashboards
-  - [ ] Alertmanager configuration
-  - [ ] Custom ZFS metrics
-  - [ ] Performance profiling
+- [ ] Alertmanager configuration
+- [ ] Performance profiling
 - [ ] Documentation
   - [ ] Complete all documentation pages
   - [ ] API documentation (OpenAPI/Swagger)
