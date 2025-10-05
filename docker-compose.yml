@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   nsboot:
     build:
@@ -10,7 +8,7 @@ services:
     privileged: true
     network_mode: host
     volumes:
-      - nsboot-data:/srv/images
+      - nsboot-images:/srv/images
       - nsboot-logs:/var/log/nsboot
       - nsboot-config:/srv/nsboot/cfg
       
