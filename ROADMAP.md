@@ -63,23 +63,23 @@ This document outlines the development roadmap for NSBoot v4.1 and beyond.
   - [x] Service and Ingress
   - [x] ConfigMaps and Secrets
 
-### 📋 Pending
-- [ ] Service mesh integration
-- [ ] Horizontal pod autoscaling
-- [ ] ZFS optimization
-  - [ ] L2ARC cache implementation
-  - [ ] ZIL optimization
-  - [ ] Automated tuning based on workload
-- [ ] Multicast boot support
-  - [ ] udpcast integration
-  - [ ] Multicast group management
-- [ ] HTTP boot support
-  - [ ] iPXE HTTP chainloading
-  - [ ] UEFI HTTP boot
-- [ ] Load balancing
-  - [ ] Nginx upstream configuration
-  - [ ] Health checks
-  - [ ] Session persistence
+### ✅ Completed
+- [x] Service mesh integration (Istio config)
+- [x] Horizontal pod autoscaling (HPA template)
+- [x] ZFS optimization
+  - [x] Automated tuning based on workload
+  - [x] L2ARC cache configuration (documented)
+  - [x] ZIL optimization (documented)
+- [x] Multicast boot support
+  - [x] udpcast integration (config)
+  - [x] Multicast group management
+- [x] HTTP boot support
+  - [x] iPXE HTTP chainloading
+  - [x] UEFI HTTP boot
+- [x] Load balancing
+  - [x] Nginx upstream configuration
+  - [x] Health checks
+  - [x] Session persistence
 
 **Success Metrics**:
 - Boot 100 clients in < 20s
