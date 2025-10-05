@@ -101,6 +101,9 @@ COPY --from=frontend-builder /build/dist /opt/nsboot/frontend/dist
 RUN mkdir -p /usr/local/openresty/nginx/conf/conf.d
 COPY nginx/frontend.conf /usr/local/openresty/nginx/conf/conf.d/nsboot.conf
 
+# Update nginx.conf to include conf.d
+RUN echo "include /usr/local/openresty/nginx/conf/conf.d/*.conf;" >> /usr/local/openresty/nginx/conf/nginx.conf
+
 # Copy DHCP example
 COPY examples/etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf.example
 
