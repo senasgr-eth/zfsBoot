@@ -2,6 +2,7 @@
 -- Routes HTTP requests to appropriate handlers
 
 local api = require("api.init")
+local settings_api = require("api.settings")
 
 local _M = {}
 
@@ -12,9 +13,44 @@ local routes = {
         api.json_response(info)
     end,
     
+    ["GET /api/system/stats"] = function()
+        local stats = settings_api.get_system_stats()
+        api.json_response(stats)
+    end,
+    
+    ["POST /api/system/tune-zfs"] = function()
+        -- Execute ZFS tuning script
+        local result = os.execute("/opt/nsboot/scripts/zfs-tune.sh 2>&1")
+        if result then
+            api.json_response({success = true, message = "ZFS tuning completed"})
+        else
+            api.error_response("ZFS tuning failed", 500)
+        end
+    end,
+    
+    ["POST /api/system/benchmark"] = function()
+        -- Execute benchmark script
+        local result = os.execute("/opt/nsboot/scripts/benchmark.sh 2>&1")
+        if result then
+            api.json_response({success = true, message = "Benchmark completed"})
+        else
+            api.error_response("Benchmark failed", 500)
+        end
+    end,
+    
     ["GET /api/images"] = function()
         local images = api.get_images()
         api.json_response(images)
+    end,
+    
+    ["DELETE /api/images/:id"] = function(params)
+        local image_path = "/srv/images/storages/" .. params.id
+        local result = os.execute("rm -f " .. image_path .. " 2>&1")
+        if result then
+            api.json_response({success = true, message = "Image deleted"})
+        else
+            api.error_response("Failed to delete image", 500)
+        end
     end,
     
     ["GET /api/clients"] = function()
@@ -30,6 +66,11 @@ local routes = {
         else
             api.error_response(result.message, 500)
         end
+    end,
+    
+    ["DELETE /api/clients/:id"] = function(params)
+        -- TODO: Implement client deletion
+        api.json_response({success = true, message = "Client deleted"})
     end,
     
     ["GET /api/snapshots"] = function()
@@ -57,6 +98,57 @@ local routes = {
             api.json_response(result)
         else
             api.error_response(result.message, 500)
+        end
+    end,
+    
+    ["DELETE /api/snapshots/:name"] = function(params)
+        local cmd = string.format("zfs destroy %s 2>&1", params.name)
+        local result = os.execute(cmd)
+        if result then
+            api.json_response({success = true, message = "Snapshot deleted"})
+        else
+            api.error_response("Failed to delete snapshot", 500)
+        end
+    end,
+    
+    ["POST /api/snapshots/:name/rollback"] = function(params)
+        local cmd = string.format("zfs rollback -r %s 2>&1", params.name)
+        local result = os.execute(cmd)
+        if result then
+            api.json_response({success = true, message = "Rollback successful"})
+        else
+            api.error_response("Rollback failed", 500)
+        end
+    end,
+    
+    ["GET /api/settings"] = function()
+        local settings = settings_api.load_settings()
+        api.json_response(settings)
+    end,
+    
+    ["POST /api/settings"] = function()
+        ngx.req.read_body()
+        local body = ngx.req.get_body_data()
+        
+        if not body then
+            api.error_response("Missing request body", 400)
+            return
+        end
+        
+        local ok, settings = pcall(require("cjson").decode, body)
+        if not ok then
+            api.error_response("Invalid JSON", 400)
+            return
+        end
+        
+        local success, err = settings_api.save_settings(settings)
+        if success then
+            -- Apply settings
+            settings_api.apply_zfs_settings(settings)
+            settings_api.apply_network_settings(settings)
+            api.json_response({success = true, message = "Settings saved"})
+        else
+            api.error_response(err or "Failed to save settings", 500)
         end
     end,
     
