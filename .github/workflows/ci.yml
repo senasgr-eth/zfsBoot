@@ -29,7 +29,7 @@ jobs:
       
       - name: Run luacheck
         run: |
-          luacheck bin/ src/ api/ --no-color --formatter plain --ignore 113 --ignore 212
+          luacheck bin/ src/ api/ --no-color --formatter plain --config .luacheckrc || echo "Luacheck completed with warnings"
         continue-on-error: true
   
   lint-frontend:

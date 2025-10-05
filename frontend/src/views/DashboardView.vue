@@ -33,7 +33,11 @@
             </div>
           </div>
           <div class="flex items-center space-x-4">
-            <button @click="toggleDarkMode" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+            <button 
+              type="button"
+              @click="() => toggleDarkMode()" 
+              class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
               <Sun v-if="isDark" class="w-5 h-5" />
               <Moon v-else class="w-5 h-5" />
             </button>
@@ -143,7 +147,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useSystemStore } from '../stores/system'
 import { useClientsStore } from '../stores/clients'
@@ -151,7 +155,7 @@ import { useImagesStore } from '../stores/images'
 import { useDark, useToggle } from '@vueuse/core'
 import {
   Server, LayoutDashboard, HardDrive, Monitor, Camera, Activity,
-  Settings, Sun, Moon, Clock, Database, Power
+  Settings, Sun, Moon, Power
 } from 'lucide-vue-next'
 import StatCard from '../components/StatCard.vue'
 import { Doughnut as DoughnutChart, Bar as BarChart } from 'vue-chartjs'
