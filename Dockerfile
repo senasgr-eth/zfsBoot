@@ -33,7 +33,6 @@ ENV TZ=UTC
 RUN apt-get update && apt-get install -y \
     # Core dependencies
     zfsutils-linux \
-    nginx-extras \
     lua5.3 \
     lua-json \
     lua-socket \
@@ -51,11 +50,21 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     wget \
+    gnupg2 \
+    ca-certificates \
+    lsb-release \
     # Monitoring
     prometheus-node-exporter \
     # Additional Lua libraries
     liblua5.3-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Install OpenResty (Nginx with Lua support)
+RUN wget -qO - https://openresty.org/package/pubkey.gpg | apt-key add - && \
+    echo "deb http://openresty.org/package/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/openresty.list && \
+    apt-get update && \
+    apt-get install -y openresty && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install LuaRocks packages for modern API
 RUN luarocks install lua-resty-http && \
@@ -89,8 +98,8 @@ COPY scripts/ /opt/nsboot/scripts/
 COPY --from=frontend-builder /build/dist /opt/nsboot/frontend/dist
 
 # Copy nginx configuration
-COPY nginx/frontend.conf /etc/nginx/sites-available/nsboot
-RUN ln -sf /etc/nginx/sites-available/nsboot /etc/nginx/sites-enabled/default
+COPY nginx/frontend.conf /usr/local/openresty/nginx/conf/nsboot.conf
+RUN ln -sf /usr/local/openresty/nginx/conf/nsboot.conf /usr/local/openresty/nginx/conf/conf.d/default.conf
 
 # Copy DHCP example
 COPY examples/etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf.example
