@@ -85,6 +85,7 @@ RUN mkdir -p /opt/nsboot \
     /srv/tftp \
     /srv/nsboot/cfg \
     /var/log/nsboot \
+    /var/log/nginx \
     /run/nsboot
 
 # Copy application files
