@@ -76,9 +76,9 @@ if [ -f /opt/nsboot/bin/server.lua ]; then
     /opt/nsboot/bin/server.lua &
 fi
 
-# Configure and test Nginx
-echo "Configuring Nginx..."
-nginx -t
+# Configure and test OpenResty
+echo "Configuring OpenResty..."
+/usr/local/openresty/bin/openresty -t
 
 # Start iSCSI target daemon
 echo "Starting iSCSI target daemon..."
@@ -92,5 +92,5 @@ echo "Web UI: http://localhost"
 echo "Prometheus: http://localhost:9100/metrics"
 echo "========================================="
 
-# Execute the main command (nginx)
-exec "$@"
+# Execute the main command (OpenResty)
+exec /usr/local/openresty/bin/openresty -g "daemon off;"

@@ -123,17 +123,19 @@ RUN ln -sf /etc/nginx/sites-available/nsboot /etc/nginx/sites-enabled/nsboot && 
 # 3260: iSCSI
 # 9100: Prometheus node exporter
 EXPOSE 80 443 67/udp 69/udp 3260 9100
-
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost/ || exit 1
 
 # Volume for persistent data
-VOLUME ["/srv/images", "/srv/tftp", "/var/log/nsboot"]
+VOLUME ["/srv/images"]
 
-# Entrypoint script
+# Expose ports
+EXPOSE 80 443 67/udp 69/udp 3260 9100
+
+# Entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD ["nginx", "-g", "daemon off;"]
+CMD []
