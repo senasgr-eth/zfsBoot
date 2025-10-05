@@ -1,3 +1,14 @@
+FROM node:20-alpine AS frontend-builder
+
+# Build frontend
+WORKDIR /build
+COPY frontend/package*.json ./
+RUN npm ci --only=production
+
+COPY frontend/ ./
+RUN npm run build
+
+# Main image
 FROM ubuntu:22.04
 
 LABEL maintainer="NSBoot Modernization Team"
@@ -45,6 +56,7 @@ RUN luarocks install lua-resty-http && \
 
 # Create application directories
 RUN mkdir -p /opt/nsboot \
+    /opt/nsboot/frontend/dist \
     /srv/images \
     /srv/images/boot \
     /srv/images/boot/snap \
@@ -59,14 +71,26 @@ RUN mkdir -p /opt/nsboot \
 # Copy application files
 COPY bin/ /opt/nsboot/bin/
 COPY src/ /opt/nsboot/src/
+COPY api/ /opt/nsboot/api/
 COPY srv/ /srv/nsboot/
-COPY examples/etc/nginx/sites-available/default /etc/nginx/sites-available/nsboot
+COPY scripts/ /opt/nsboot/scripts/
+
+# Copy frontend build from builder stage
+COPY --from=frontend-builder /build/dist /opt/nsboot/frontend/dist
+
+# Copy nginx configuration
+COPY nginx/frontend.conf /etc/nginx/sites-available/nsboot
+RUN ln -sf /etc/nginx/sites-available/nsboot /etc/nginx/sites-enabled/default
+
+# Copy DHCP example
 COPY examples/etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf.example
 
 # Set permissions
 RUN chown -R www-data:www-data /srv/images && \
     chown -R www-data:www-data /var/log/nsboot && \
-    chmod +x /opt/nsboot/bin/*.lua
+    chown -R www-data:www-data /opt/nsboot/frontend && \
+    chmod +x /opt/nsboot/bin/*.lua && \
+    chmod +x /opt/nsboot/scripts/*.sh
 
 # Create nginx symlink
 RUN ln -sf /etc/nginx/sites-available/nsboot /etc/nginx/sites-enabled/nsboot && \

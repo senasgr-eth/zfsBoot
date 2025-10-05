@@ -6,20 +6,11 @@ services:
       context: .
       dockerfile: Dockerfile
     image: nsboot:4.1.0
-    container_name: nsboot-server
-    privileged: true  # Required for ZFS operations
-    network_mode: host  # Required for PXE/DHCP
-    restart: unless-stopped
-    
-    environment:
-      - TZ=UTC
-      - NSBOOT_ENV=production
-      - NSBOOT_LOG_LEVEL=info
-    
+    container_name: nsboot
+    privileged: true
+    network_mode: host
     volumes:
-      # Persistent storage
-      - nsboot-images:/srv/images
-      - nsboot-tftp:/srv/tftp
+      - nsboot-data:/srv/images
       - nsboot-logs:/var/log/nsboot
       - nsboot-config:/srv/nsboot/cfg
       
