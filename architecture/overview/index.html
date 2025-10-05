@@ -1,0 +1,1329 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Modern Diskless Boot System - Documentation" name="description"/>
+<meta content="NSBoot Team" name="author"/>
+<link href="https://nsboot.github.io/architecture/overview/" rel="canonical"/>
+<link href="../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.21" name="generator"/>
+<title>Architecture Overview - NSBoot Documentation</title>
+<link href="../../assets/stylesheets/main.2a3383ac.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="blue" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#architecture-overview">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<div data-md-color-scheme="default" data-md-component="outdated" hidden="">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="NSBoot Documentation" class="md-header__button md-logo" data-md-component="logo" href="../.." title="NSBoot Documentation">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            NSBoot Documentation
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Architecture Overview
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="blue" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="blue" data-md-color-scheme="slate" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/vkornilyev1988/NSBoot-" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    vkornilyev1988/NSBoot-
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../..">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../getting-started/installation/">
+          
+  
+  
+  Getting Started
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../user-guide/dashboard.md">
+          
+  
+  
+  User Guide
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../admin/zfs-config.md">
+          
+  
+  
+  Administration
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../api/overview.md">
+          
+  
+  
+  API Reference
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../deployment/docker.md">
+          
+  
+  
+  Deployment
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../troubleshooting/common-issues.md">
+          
+  
+  
+  Troubleshooting
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../development/architecture.md">
+          
+  
+  
+  Development
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../changelog.md">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="NSBoot Documentation" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="NSBoot Documentation">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    NSBoot Documentation
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/vkornilyev1988/NSBoot-" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    vkornilyev1988/NSBoot-
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../..">
+<span class="md-ellipsis">
+    Home
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../getting-started/installation/">
+<span class="md-ellipsis">
+    Installation
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../getting-started/quick-start/">
+<span class="md-ellipsis">
+    Quick Start
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../getting-started/configuration.md">
+<span class="md-ellipsis">
+    Configuration
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-ellipsis">
+    User Guide
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../user-guide/dashboard.md">
+<span class="md-ellipsis">
+    Dashboard
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../user-guide/images.md">
+<span class="md-ellipsis">
+    Managing Images
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../user-guide/clients.md">
+<span class="md-ellipsis">
+    Managing Clients
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../user-guide/snapshots.md">
+<span class="md-ellipsis">
+    Snapshots
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../user-guide/monitoring.md">
+<span class="md-ellipsis">
+    Monitoring
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    Administration
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            Administration
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../admin/zfs-config.md">
+<span class="md-ellipsis">
+    ZFS Configuration
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../admin/network-setup.md">
+<span class="md-ellipsis">
+    Network Setup
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../admin/performance.md">
+<span class="md-ellipsis">
+    Performance Tuning
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../admin/security.md">
+<span class="md-ellipsis">
+    Security
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../admin/backup.md">
+<span class="md-ellipsis">
+    Backup &amp; Recovery
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+<span class="md-ellipsis">
+    API Reference
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../api/overview.md">
+<span class="md-ellipsis">
+    Overview
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../api/system.md">
+<span class="md-ellipsis">
+    System API
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../api/images.md">
+<span class="md-ellipsis">
+    Images API
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../api/clients.md">
+<span class="md-ellipsis">
+    Clients API
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../api/snapshots.md">
+<span class="md-ellipsis">
+    Snapshots API
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+<span class="md-ellipsis">
+    Deployment
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            Deployment
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../deployment/docker.md">
+<span class="md-ellipsis">
+    Docker
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../deployment/kubernetes.md">
+<span class="md-ellipsis">
+    Kubernetes
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../deployment/bare-metal.md">
+<span class="md-ellipsis">
+    Bare Metal
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_7" type="checkbox"/>
+<label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+<span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_7_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_7">
+<span class="md-nav__icon md-icon"></span>
+            Troubleshooting
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../troubleshooting/common-issues.md">
+<span class="md-ellipsis">
+    Common Issues
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../troubleshooting/logs.md">
+<span class="md-ellipsis">
+    Logs
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../troubleshooting/faq.md">
+<span class="md-ellipsis">
+    FAQ
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_8" type="checkbox"/>
+<label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+<span class="md-ellipsis">
+    Development
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_8_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_8">
+<span class="md-nav__icon md-icon"></span>
+            Development
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../development/architecture.md">
+<span class="md-ellipsis">
+    Architecture
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../development/contributing.md">
+<span class="md-ellipsis">
+    Contributing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../development/building.md">
+<span class="md-ellipsis">
+    Building from Source
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../changelog.md">
+<span class="md-ellipsis">
+    Changelog
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#high-level-architecture">
+<span class="md-ellipsis">
+      High-Level Architecture
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#component-architecture">
+<span class="md-ellipsis">
+      Component Architecture
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#data-flow">
+<span class="md-ellipsis">
+      Data Flow
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#boot-process-flow">
+<span class="md-ellipsis">
+      Boot Process Flow
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deployment-architecture">
+<span class="md-ellipsis">
+      Deployment Architecture
+    </span>
+</a>
+<nav aria-label="Deployment Architecture" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#docker-deployment">
+<span class="md-ellipsis">
+      Docker Deployment
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubernetes-deployment">
+<span class="md-ellipsis">
+      Kubernetes Deployment
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#security-architecture">
+<span class="md-ellipsis">
+      Security Architecture
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#storage-architecture">
+<span class="md-ellipsis">
+      Storage Architecture
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#api-architecture">
+<span class="md-ellipsis">
+      API Architecture
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#monitoring-architecture">
+<span class="md-ellipsis">
+      Monitoring Architecture
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#technology-stack">
+<span class="md-ellipsis">
+      Technology Stack
+    </span>
+</a>
+<nav aria-label="Technology Stack" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#frontend">
+<span class="md-ellipsis">
+      Frontend
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#backend">
+<span class="md-ellipsis">
+      Backend
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#storage">
+<span class="md-ellipsis">
+      Storage
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#network">
+<span class="md-ellipsis">
+      Network
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#monitoring">
+<span class="md-ellipsis">
+      Monitoring
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#devops">
+<span class="md-ellipsis">
+      DevOps
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#design-principles">
+<span class="md-ellipsis">
+      Design Principles
+    </span>
+</a>
+<nav aria-label="Design Principles" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-separation-of-concerns">
+<span class="md-ellipsis">
+      1. Separation of Concerns
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-api-first-design">
+<span class="md-ellipsis">
+      2. API-First Design
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-scalability">
+<span class="md-ellipsis">
+      3. Scalability
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#4-security">
+<span class="md-ellipsis">
+      4. Security
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#5-observability">
+<span class="md-ellipsis">
+      5. Observability
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#6-developer-experience">
+<span class="md-ellipsis">
+      6. Developer Experience
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#performance-characteristics">
+<span class="md-ellipsis">
+      Performance Characteristics
+    </span>
+</a>
+<nav aria-label="Performance Characteristics" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#latency">
+<span class="md-ellipsis">
+      Latency
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#throughput">
+<span class="md-ellipsis">
+      Throughput
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#scalability">
+<span class="md-ellipsis">
+      Scalability
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#next-steps">
+<span class="md-ellipsis">
+      Next Steps
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="architecture-overview">Architecture Overview<a class="headerlink" href="#architecture-overview" title="Permanent link">¶</a></h1>
+<p>NSBoot follows a modern, layered architecture designed for scalability and maintainability.</p>
+<h2 id="high-level-architecture">High-Level Architecture<a class="headerlink" href="#high-level-architecture" title="Permanent link">¶</a></h2>
+<div class="mermaid">graph TB
+    subgraph "Client Layer"
+        C1[Client 1]
+        C2[Client 2]
+        C3[Client N]
+    end
+
+    subgraph "Network Layer"
+        DHCP[DHCP Server]
+        TFTP[TFTP Server]
+        PXE[PXE/iPXE]
+    end
+
+    subgraph "Application Layer"
+        WEB[Web UI<br/>Vue.js 3]
+        API[REST API<br/>OpenResty/Lua]
+        WS[WebSocket<br/>Real-time]
+    end
+
+    subgraph "Storage Layer"
+        ISCSI[iSCSI Target]
+        ZFS[ZFS Pool]
+        SNAP[Snapshots]
+    end
+
+    subgraph "Monitoring Layer"
+        PROM[Prometheus]
+        GRAF[Grafana]
+        ALERT[Alertmanager]
+    end
+
+    C1 &amp; C2 &amp; C3 --&gt; DHCP
+    C1 &amp; C2 &amp; C3 --&gt; TFTP
+    C1 &amp; C2 &amp; C3 --&gt; ISCSI
+
+    DHCP --&gt; PXE
+    TFTP --&gt; PXE
+
+    WEB --&gt; API
+    WEB --&gt; WS
+    API --&gt; ZFS
+    API --&gt; ISCSI
+    WS --&gt; API
+
+    ISCSI --&gt; ZFS
+    ZFS --&gt; SNAP
+
+    API --&gt; PROM
+    PROM --&gt; GRAF
+    PROM --&gt; ALERT
+
+    style WEB fill:#3b82f6
+    style API fill:#10b981
+    style ZFS fill:#f59e0b
+    style PROM fill:#ef4444
+</div>
+<h2 id="component-architecture">Component Architecture<a class="headerlink" href="#component-architecture" title="Permanent link">¶</a></h2>
+<div class="mermaid">graph LR
+    subgraph "Frontend"
+        V[Vue.js 3]
+        TS[TypeScript]
+        TW[Tailwind CSS]
+        P[Pinia]
+        VR[Vue Router]
+    end
+
+    subgraph "Backend"
+        OR[OpenResty]
+        L[Lua 5.3]
+        JWT[JWT Auth]
+        WSS[WebSocket]
+    end
+
+    subgraph "Storage"
+        ZP[ZFS Pool]
+        DS[Datasets]
+        SN[Snapshots]
+    end
+
+    V --&gt; TS
+    V --&gt; TW
+    V --&gt; P
+    V --&gt; VR
+
+    OR --&gt; L
+    L --&gt; JWT
+    L --&gt; WSS
+
+    ZP --&gt; DS
+    DS --&gt; SN
+
+    V -.HTTP/WS.-&gt; OR
+    OR -.ZFS CLI.-&gt; ZP
+
+    style V fill:#42b883
+    style OR fill:#00758f
+    style ZP fill:#f59e0b
+</div>
+<h2 id="data-flow">Data Flow<a class="headerlink" href="#data-flow" title="Permanent link">¶</a></h2>
+<div class="mermaid">sequenceDiagram
+    participant C as Client
+    participant W as Web UI
+    participant A as API
+    participant Z as ZFS
+    participant I as iSCSI
+
+    C-&gt;&gt;W: Access Dashboard
+    W-&gt;&gt;A: GET /api/system/info
+    A-&gt;&gt;Z: zfs list
+    Z--&gt;&gt;A: Dataset info
+    A--&gt;&gt;W: JSON response
+    W--&gt;&gt;C: Render UI
+
+    C-&gt;&gt;W: Upload Image
+    W-&gt;&gt;A: POST /api/images/upload
+    A-&gt;&gt;Z: zfs receive
+    Z--&gt;&gt;A: Success
+    A--&gt;&gt;W: Upload complete
+
+    C-&gt;&gt;W: Boot Client
+    W-&gt;&gt;A: POST /api/clients/boot
+    A-&gt;&gt;I: Create iSCSI target
+    I-&gt;&gt;Z: Map ZFS volume
+    A--&gt;&gt;W: Target created
+    W--&gt;&gt;C: Boot initiated
+</div>
+<h2 id="boot-process-flow">Boot Process Flow<a class="headerlink" href="#boot-process-flow" title="Permanent link">¶</a></h2>
+<div class="mermaid">graph TD
+    START[Client Power On] --&gt; BIOS[BIOS/UEFI]
+    BIOS --&gt; NET[Network Boot]
+    NET --&gt; DHCP[DHCP Request]
+    DHCP --&gt; IP[Get IP + Boot Server]
+    IP --&gt; TFTP[TFTP Download iPXE]
+    TFTP --&gt; IPXE[iPXE Execution]
+    IPXE --&gt; ISCSI[Connect iSCSI Target]
+    ISCSI --&gt; ZFS[Mount ZFS Volume]
+    ZFS --&gt; BOOT[Boot OS]
+    BOOT --&gt; ONLINE[Client Online]
+
+    style START fill:#3b82f6
+    style ONLINE fill:#10b981
+</div>
+<h2 id="deployment-architecture">Deployment Architecture<a class="headerlink" href="#deployment-architecture" title="Permanent link">¶</a></h2>
+<h3 id="docker-deployment">Docker Deployment<a class="headerlink" href="#docker-deployment" title="Permanent link">¶</a></h3>
+<div class="mermaid">graph TB
+    subgraph "Docker Host"
+        subgraph "NSBoot Container"
+            NGINX[Nginx + OpenResty]
+            LUA[Lua API]
+            FRONT[Frontend Static]
+        end
+
+        subgraph "Monitoring"
+            PROM[Prometheus]
+            GRAF[Grafana]
+        end
+
+        VOL1[Volume: Images]
+        VOL2[Volume: Config]
+    end
+
+    NGINX --&gt; LUA
+    NGINX --&gt; FRONT
+    LUA --&gt; VOL1
+    LUA --&gt; VOL2
+
+    LUA -.metrics.-&gt; PROM
+    PROM --&gt; GRAF
+</div>
+<h3 id="kubernetes-deployment">Kubernetes Deployment<a class="headerlink" href="#kubernetes-deployment" title="Permanent link">¶</a></h3>
+<div class="mermaid">graph TB
+    subgraph "Kubernetes Cluster"
+        ING[Ingress]
+
+        subgraph "NSBoot Namespace"
+            SVC[Service]
+            POD1[Pod 1]
+            POD2[Pod 2]
+            PVC1[PVC: Images]
+            PVC2[PVC: Config]
+        end
+
+        subgraph "Monitoring"
+            PROM[Prometheus]
+            GRAF[Grafana]
+        end
+    end
+
+    ING --&gt; SVC
+    SVC --&gt; POD1
+    SVC --&gt; POD2
+    POD1 --&gt; PVC1
+    POD2 --&gt; PVC1
+    POD1 --&gt; PVC2
+
+    POD1 -.metrics.-&gt; PROM
+    POD2 -.metrics.-&gt; PROM
+    PROM --&gt; GRAF
+</div>
+<h2 id="security-architecture">Security Architecture<a class="headerlink" href="#security-architecture" title="Permanent link">¶</a></h2>
+<div class="mermaid">graph LR
+    subgraph "External"
+        USER[User]
+        CLIENT[Client]
+    end
+
+    subgraph "Security Layer"
+        FW[Firewall]
+        TLS[TLS/HTTPS]
+        JWT[JWT Auth]
+        RBAC[RBAC]
+    end
+
+    subgraph "Application"
+        API[API]
+        DATA[Data]
+    end
+
+    USER --&gt; FW
+    FW --&gt; TLS
+    TLS --&gt; JWT
+    JWT --&gt; RBAC
+    RBAC --&gt; API
+    API --&gt; DATA
+
+    CLIENT --&gt; FW
+
+    style FW fill:#ef4444
+    style JWT fill:#f59e0b
+    style RBAC fill:#10b981
+</div>
+<h2 id="storage-architecture">Storage Architecture<a class="headerlink" href="#storage-architecture" title="Permanent link">¶</a></h2>
+<div class="mermaid">graph TB
+    subgraph "ZFS Pool"
+        ROOT[nsboot0]
+
+        subgraph "Datasets"
+            IMG[images/]
+            STOR[storages/]
+            BOOT[boot/]
+            SNAP[snapshots/]
+        end
+    end
+
+    ROOT --&gt; IMG
+    ROOT --&gt; STOR
+    ROOT --&gt; BOOT
+    ROOT --&gt; SNAP
+
+    STOR -.snapshot.-&gt; SNAP
+
+    subgraph "Features"
+        COMP[Compression: LZ4]
+        DEDUP[Deduplication]
+        ARC[ARC Cache]
+    end
+
+    ROOT --&gt; COMP
+    ROOT --&gt; DEDUP
+    ROOT --&gt; ARC
+
+    style ROOT fill:#f59e0b
+    style SNAP fill:#3b82f6
+</div>
+<h2 id="api-architecture">API Architecture<a class="headerlink" href="#api-architecture" title="Permanent link">¶</a></h2>
+<div class="mermaid">graph TB
+    subgraph "API Layer"
+        ROUTER[Router]
+
+        subgraph "Modules"
+            AUTH[Auth Module]
+            SYS[System Module]
+            IMG[Images Module]
+            CLI[Clients Module]
+            SNAP[Snapshots Module]
+            SET[Settings Module]
+        end
+
+        subgraph "Middleware"
+            JWT[JWT Verify]
+            CORS[CORS]
+            RATE[Rate Limit]
+            LOG[Logging]
+        end
+    end
+
+    ROUTER --&gt; JWT
+    JWT --&gt; CORS
+    CORS --&gt; RATE
+    RATE --&gt; LOG
+
+    LOG --&gt; AUTH
+    LOG --&gt; SYS
+    LOG --&gt; IMG
+    LOG --&gt; CLI
+    LOG --&gt; SNAP
+    LOG --&gt; SET
+
+    style ROUTER fill:#3b82f6
+    style JWT fill:#f59e0b
+</div>
+<h2 id="monitoring-architecture">Monitoring Architecture<a class="headerlink" href="#monitoring-architecture" title="Permanent link">¶</a></h2>
+<div class="mermaid">graph LR
+    subgraph "Metrics Sources"
+        APP[Application]
+        NODE[Node Exporter]
+        ZFS[ZFS Exporter]
+        NGINX[Nginx Exporter]
+    end
+
+    subgraph "Collection"
+        PROM[Prometheus]
+    end
+
+    subgraph "Visualization"
+        GRAF[Grafana]
+    end
+
+    subgraph "Alerting"
+        ALERT[Alertmanager]
+        EMAIL[Email]
+        SLACK[Slack]
+    end
+
+    APP --&gt; PROM
+    NODE --&gt; PROM
+    ZFS --&gt; PROM
+    NGINX --&gt; PROM
+
+    PROM --&gt; GRAF
+    PROM --&gt; ALERT
+
+    ALERT --&gt; EMAIL
+    ALERT --&gt; SLACK
+
+    style PROM fill:#ef4444
+    style GRAF fill:#f59e0b
+</div>
+<h2 id="technology-stack">Technology Stack<a class="headerlink" href="#technology-stack" title="Permanent link">¶</a></h2>
+<h3 id="frontend">Frontend<a class="headerlink" href="#frontend" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Framework</strong>: Vue.js 3.4 (Composition API)</li>
+<li><strong>Language</strong>: TypeScript 5.4</li>
+<li><strong>Styling</strong>: Tailwind CSS 3.4</li>
+<li><strong>State</strong>: Pinia 2.1</li>
+<li><strong>Router</strong>: Vue Router 4.x</li>
+<li><strong>Charts</strong>: Chart.js 4.4</li>
+<li><strong>Build</strong>: Vite 5.1</li>
+</ul>
+<h3 id="backend">Backend<a class="headerlink" href="#backend" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Server</strong>: OpenResty (Nginx + LuaJIT)</li>
+<li><strong>Language</strong>: Lua 5.3</li>
+<li><strong>JSON</strong>: lua-cjson</li>
+<li><strong>HTTP</strong>: lua-resty-http</li>
+<li><strong>JWT</strong>: lua-resty-jwt</li>
+<li><strong>WebSocket</strong>: lua-resty-websocket</li>
+</ul>
+<h3 id="storage">Storage<a class="headerlink" href="#storage" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Filesystem</strong>: ZFS 2.1+</li>
+<li><strong>Block Storage</strong>: iSCSI (tgt), NBD</li>
+<li><strong>Compression</strong>: LZ4, GZIP, ZSTD</li>
+<li><strong>Snapshots</strong>: ZFS native</li>
+</ul>
+<h3 id="network">Network<a class="headerlink" href="#network" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Boot</strong>: PXE, iPXE, UEFI</li>
+<li><strong>DHCP</strong>: isc-dhcp-server</li>
+<li><strong>TFTP</strong>: tftpd-hpa</li>
+<li><strong>Protocol</strong>: iSCSI, NBD</li>
+</ul>
+<h3 id="monitoring">Monitoring<a class="headerlink" href="#monitoring" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Metrics</strong>: Prometheus 2.x</li>
+<li><strong>Visualization</strong>: Grafana 10.x</li>
+<li><strong>Alerting</strong>: Alertmanager</li>
+<li><strong>Exporters</strong>: Node, ZFS, Nginx</li>
+</ul>
+<h3 id="devops">DevOps<a class="headerlink" href="#devops" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Container</strong>: Docker 24.0+</li>
+<li><strong>Orchestration</strong>: Kubernetes 1.24+</li>
+<li><strong>Package</strong>: Helm 3.0+</li>
+<li><strong>CI/CD</strong>: GitHub Actions</li>
+</ul>
+<h2 id="design-principles">Design Principles<a class="headerlink" href="#design-principles" title="Permanent link">¶</a></h2>
+<h3 id="1-separation-of-concerns">1. Separation of Concerns<a class="headerlink" href="#1-separation-of-concerns" title="Permanent link">¶</a></h3>
+<ul>
+<li>Frontend handles UI/UX</li>
+<li>Backend handles business logic</li>
+<li>Storage handles data persistence</li>
+</ul>
+<h3 id="2-api-first-design">2. API-First Design<a class="headerlink" href="#2-api-first-design" title="Permanent link">¶</a></h3>
+<ul>
+<li>RESTful API for all operations</li>
+<li>WebSocket for real-time updates</li>
+<li>OpenAPI documentation</li>
+</ul>
+<h3 id="3-scalability">3. Scalability<a class="headerlink" href="#3-scalability" title="Permanent link">¶</a></h3>
+<ul>
+<li>Horizontal scaling via Kubernetes</li>
+<li>Stateless API design</li>
+<li>Distributed storage with ZFS</li>
+</ul>
+<h3 id="4-security">4. Security<a class="headerlink" href="#4-security" title="Permanent link">¶</a></h3>
+<ul>
+<li>JWT authentication</li>
+<li>HTTPS/TLS encryption</li>
+<li>Role-based access control</li>
+<li>Security headers</li>
+</ul>
+<h3 id="5-observability">5. Observability<a class="headerlink" href="#5-observability" title="Permanent link">¶</a></h3>
+<ul>
+<li>Prometheus metrics</li>
+<li>Structured logging</li>
+<li>Distributed tracing (future)</li>
+<li>Health checks</li>
+</ul>
+<h3 id="6-developer-experience">6. Developer Experience<a class="headerlink" href="#6-developer-experience" title="Permanent link">¶</a></h3>
+<ul>
+<li>TypeScript for type safety</li>
+<li>Hot reload in development</li>
+<li>Comprehensive documentation</li>
+<li>Easy local setup</li>
+</ul>
+<h2 id="performance-characteristics">Performance Characteristics<a class="headerlink" href="#performance-characteristics" title="Permanent link">¶</a></h2>
+<h3 id="latency">Latency<a class="headerlink" href="#latency" title="Permanent link">¶</a></h3>
+<ul>
+<li>API response: &lt;100ms (p95)</li>
+<li>Page load: &lt;2s</li>
+<li>WebSocket latency: &lt;50ms</li>
+<li>Boot time: &lt;30s per client</li>
+</ul>
+<h3 id="throughput">Throughput<a class="headerlink" href="#throughput" title="Permanent link">¶</a></h3>
+<ul>
+<li>API requests: 1000 req/s</li>
+<li>Concurrent boots: 100 clients</li>
+<li>ZFS IOPS: &gt;10,000</li>
+<li>Network: 10 Gbps</li>
+</ul>
+<h3 id="scalability">Scalability<a class="headerlink" href="#scalability" title="Permanent link">¶</a></h3>
+<ul>
+<li>Clients: 1000+ per server</li>
+<li>Images: Unlimited (storage limited)</li>
+<li>Concurrent users: 100+</li>
+<li>Kubernetes pods: Auto-scale</li>
+</ul>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">¶</a></h2>
+<ul>
+<li><a href="components.md">Component Details</a></li>
+<li><a href="data-models.md">Data Models</a></li>
+<li><a href="../api/overview.md">API Design</a></li>
+<li><a href="../deployment/">Deployment</a></li>
+</ul>
+</article>
+</div>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/vkornilyev1988/NSBoot-" rel="noopener" target="_blank" title="github.com">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</a>
+<a class="md-social__link" href="https://hub.docker.com/r/nsboot/nsboot" rel="noopener" target="_blank" title="hub.docker.com">
+<svg viewbox="0 0 640 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+<script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>
