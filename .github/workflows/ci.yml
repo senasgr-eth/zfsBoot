@@ -81,15 +81,19 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y lua5.3 liblua5.3-dev lua-json lua-socket lua-posix lua-cjson
+          sudo apt-get install -y lua5.3 liblua5.3-dev lua-json lua-socket lua-posix
       
       - name: Run Lua tests
         run: |
           if [ -d "test" ]; then
-            lua5.3 test/run_tests.lua || echo "No tests found"
-{{ ... }}
+            lua5.3 test/api_test.lua || echo "No tests found"
+          fi
 
   test-frontend:
     name: Test Frontend
