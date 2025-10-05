@@ -1,0 +1,158 @@
+/* WCAG 2.1 Accessibility Styles */
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #3b82f6;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Focus visible styles */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-primary: #0000ff;
+    --color-text: #000000;
+    --color-background: #ffffff;
+  }
+  
+  .dark {
+    --color-primary: #00ffff;
+    --color-text: #ffffff;
+    --color-background: #000000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Ensure sufficient color contrast */
+.text-low-contrast {
+  color: #6b7280; /* Minimum 4.5:1 contrast ratio */
+}
+
+.dark .text-low-contrast {
+  color: #9ca3af; /* Adjusted for dark mode */
+}
+
+/* Touch target size (minimum 44x44px) */
+button,
+a,
+input[type="checkbox"],
+input[type="radio"] {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Keyboard navigation indicators */
+.keyboard-user *:focus {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Error states with icons (not just color) */
+.error {
+  border-color: #ef4444;
+}
+
+.error::before {
+  content: "⚠ ";
+  color: #ef4444;
+}
+
+/* Success states with icons */
+.success::before {
+  content: "✓ ";
+  color: #10b981;
+}
+
+/* Loading states */
+.loading {
+  position: relative;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #3b82f6;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Ensure form labels are associated */
+label {
+  cursor: pointer;
+}
+
+/* Required field indicator */
+.required::after {
+  content: " *";
+  color: #ef4444;
+  aria-label: "required";
+}
+
+/* Disabled state */
+:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Focus within for containers */
+.focus-within:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
