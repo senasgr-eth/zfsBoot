@@ -51,15 +51,15 @@
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <StatCard
           title="Active Clients"
-          :value="systemStore.systemInfo?.clients_active || 0"
-          :total="systemStore.systemInfo?.clients_total"
+          :value="systemStore.info?.clients_online || 0"
+          :total="clientsStore.clients.length"
           icon="Monitor"
           color="blue"
         />
         <StatCard
           title="ZFS Pool Usage"
-          :value="formatBytes(systemStore.systemInfo?.zfs_pool_usage || 0)"
-          :subtitle="`${systemStore.poolUsagePercent.toFixed(1)}% used`"
+          :value="formatBytes(systemStore.stats?.disk || 0)"
+          subtitle="Storage"
           icon="Database"
           color="green"
         />
@@ -71,7 +71,7 @@
         />
         <StatCard
           title="System Uptime"
-          :value="formatUptime(systemStore.systemInfo?.uptime || 0)"
+          :value="formatUptime(systemStore.info?.uptime || 0)"
           icon="Clock"
           color="orange"
         />

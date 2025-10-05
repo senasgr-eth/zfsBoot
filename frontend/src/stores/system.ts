@@ -60,12 +60,21 @@ export const useSystemStore = defineStore('system', () => {
   // Initialize WebSocket on store creation
   setupWebSocket()
 
+  // Computed properties for backward compatibility
+  const systemInfo = computed(() => info.value)
+  const poolUsagePercent = computed(() => {
+    if (!stats.value.disk) return 0
+    return (stats.value.disk / 1000) * 100 // Mock calculation
+  })
+
   return {
     info,
     stats,
     loading,
     error,
     wsConnected,
+    systemInfo,
+    poolUsagePercent,
     fetchSystemInfo
   }
 })
