@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import api from '../services/api'
-
+import websocket from '../services/websocket'
 
 export const useSystemStore = defineStore('system', () => {
   const info = ref<any>({
@@ -52,7 +52,7 @@ export const useSystemStore = defineStore('system', () => {
       console.log('WebSocket disconnected')
     })
 
-    websocket.on('system_stats', (data) => {
+    websocket.on('system_stats', (data: any) => {
       stats.value = data
     })
   }
@@ -68,3 +68,4 @@ export const useSystemStore = defineStore('system', () => {
     wsConnected,
     fetchSystemInfo
   }
+})
