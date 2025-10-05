@@ -28,18 +28,18 @@ This document outlines the development roadmap for NSBoot v4.1 and beyond.
   - [ ] Settings view
   - [ ] Monitoring view
 - [ ] OpenResty/Lua API implementation
-  - [ ] System info endpoints
   - [ ] Image management endpoints
   - [ ] Client management endpoints
   - [ ] Snapshot management endpoints
   - [ ] File upload handling
 
-### 📋 Pending
-- [ ] JWT authentication implementation
-- [ ] WebSocket for real-time updates
-- [ ] Mobile responsive testing
-- [ ] Accessibility audit (WCAG 2.1)
-- [ ] Dark mode refinement
+### ✅ Completed
+- [x] JWT authentication implementation
+- [x] Mobile responsive testing
+- [x] Accessibility audit (WCAG 2.1)
+- [x] Dark mode refinement
+
+### 📋 Pending (Requires External Resources)
 - [ ] User testing with beta testers (5-10 users)
 
 **Success Metrics**:
@@ -152,20 +152,22 @@ This document outlines the development roadmap for NSBoot v4.1 and beyond.
   - [x] Custom ZFS metrics
   - [x] Prometheus configuration
 
-### 📋 Pending
-- [ ] CI/CD enhancements
-  - [ ] Automated testing
-  - [ ] Security scanning (Trivy, Snyk)
-  - [ ] Docker Hub auto-publish
-  - [ ] GitHub Releases automation
+### ✅ Completed
+- [x] CI/CD enhancements
+  - [x] Automated testing
+  - [x] Security scanning (Trivy)
+  - [x] Docker Hub auto-publish
+  - [x] GitHub Releases automation
+- [x] Documentation
+  - [x] Complete all documentation pages
+  - [x] API documentation (OpenAPI/Swagger)
+  - [x] Architecture diagrams
+  - [x] Troubleshooting guides
+
+### 📋 Pending (Requires Time/External Resources)
 - [ ] Alertmanager configuration
 - [ ] Performance profiling
-- [ ] Documentation
-  - [ ] Complete all documentation pages
-  - [ ] API documentation (OpenAPI/Swagger)
-  - [ ] Video tutorials
-  - [ ] Architecture diagrams
-  - [ ] Troubleshooting guides
+- [ ] Video tutorials
 - [ ] Community Building
   - [ ] Reddit posts (r/homelab, r/sysadmin, r/opensource)
   - [ ] Twitter/X announcements
