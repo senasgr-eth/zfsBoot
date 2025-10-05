@@ -98,8 +98,8 @@ COPY scripts/ /opt/nsboot/scripts/
 COPY --from=frontend-builder /build/dist /opt/nsboot/frontend/dist
 
 # Copy nginx configuration
-COPY nginx/frontend.conf /usr/local/openresty/nginx/conf/nsboot.conf
-RUN ln -sf /usr/local/openresty/nginx/conf/nsboot.conf /usr/local/openresty/nginx/conf/conf.d/default.conf
+RUN mkdir -p /usr/local/openresty/nginx/conf/conf.d
+COPY nginx/frontend.conf /usr/local/openresty/nginx/conf/conf.d/nsboot.conf
 
 # Copy DHCP example
 COPY examples/etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf.example
