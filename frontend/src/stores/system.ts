@@ -2,46 +2,69 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '../services/api'
 
-export interface SystemInfo {
-  version: string
-  hostname: string
-  uptime: number
-  clients_active: number
-  clients_total: number
-  zfs_pool_usage: number
-  zfs_pool_size: number
-  zfs_pool_available: number
-}
 
 export const useSystemStore = defineStore('system', () => {
-  const systemInfo = ref<SystemInfo | null>(null)
+  const info = ref<any>({
+    version: '4.1.0',
+    hostname: 'nsboot-server',
+    uptime: 0,
+    clients_online: 0,
+    total_images: 0,
+    total_snapshots: 0
+  })
+
+  const stats = ref<any>({
+    cpu: 0,
+    memory: 0,
+    network_rx: 0,
+    network_tx: 0,
+    active_clients: 0
+  })
+
   const loading = ref(false)
   const error = ref<string | null>(null)
-
-  const poolUsagePercent = computed(() => {
-    if (!systemInfo.value) return 0
-    return (systemInfo.value.zfs_pool_usage / systemInfo.value.zfs_pool_size) * 100
-  })
+  const wsConnected = ref(false)
 
   async function fetchSystemInfo() {
     loading.value = true
     error.value = null
+    
     try {
       const response = await api.get('/api/system/info')
-      systemInfo.value = response.data
-    } catch (e: any) {
-      error.value = e.message || 'Failed to fetch system info'
-      console.error('Error fetching system info:', e)
+      info.value = response.data
+    } catch (err: any) {
+      error.value = err.message || 'Failed to fetch system info'
+      console.error('Failed to fetch system info:', err)
     } finally {
       loading.value = false
     }
   }
 
+  // WebSocket handlers
+  function setupWebSocket() {
+    websocket.on('connected', () => {
+      wsConnected.value = true
+      console.log('WebSocket connected')
+    })
+
+    websocket.on('disconnected', () => {
+      wsConnected.value = false
+      console.log('WebSocket disconnected')
+    })
+
+    websocket.on('system_stats', (data) => {
+      stats.value = data
+    })
+  }
+
+  // Initialize WebSocket on store creation
+  setupWebSocket()
+
   return {
-    systemInfo,
+    info,
+    stats,
     loading,
     error,
-    poolUsagePercent,
+    wsConnected,
     fetchSystemInfo
   }
-})
