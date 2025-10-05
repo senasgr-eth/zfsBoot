@@ -114,10 +114,6 @@ RUN chown -R www-data:www-data /srv/images && \
     chmod +x /opt/nsboot/bin/*.lua && \
     chmod +x /opt/nsboot/scripts/*.sh
 
-# Create nginx symlink
-RUN ln -sf /etc/nginx/sites-available/nsboot /etc/nginx/sites-enabled/nsboot && \
-    rm -f /etc/nginx/sites-enabled/default
-
 # Expose ports
 # 80: HTTP Web UI
 # 443: HTTPS Web UI
@@ -126,15 +122,13 @@ RUN ln -sf /etc/nginx/sites-available/nsboot /etc/nginx/sites-enabled/nsboot && 
 # 3260: iSCSI
 # 9100: Prometheus node exporter
 EXPOSE 80 443 67/udp 69/udp 3260 9100
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost/ || exit 1
 
 # Volume for persistent data
 VOLUME ["/srv/images"]
-
-# Expose ports
-EXPOSE 80 443 67/udp 69/udp 3260 9100
 
 # Entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
