@@ -2,10 +2,20 @@ FROM node:20-alpine AS frontend-builder
 
 # Build frontend
 WORKDIR /build
-COPY frontend/package*.json ./
-RUN npm install
 
+# Copy package files
+COPY frontend/package*.json ./
+
+# Install dependencies with increased timeout and retries
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm install --verbose || npm install --verbose || npm install --legacy-peer-deps
+
+# Copy source files
 COPY frontend/ ./
+
+# Build application
 RUN npm run build
 
 # Main image
