@@ -1,0 +1,165 @@
+# Istio Service Mesh Configuration for NSBoot
+# Provides advanced traffic management, security, and observability
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: nsboot-gateway
+  namespace: nsboot
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "nsboot.example.com"
+    - "*"
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: nsboot-tls
+    hosts:
+    - "nsboot.example.com"
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nsboot
+  namespace: nsboot
+spec:
+  hosts:
+  - "nsboot.example.com"
+  - "*"
+  gateways:
+  - nsboot-gateway
+  http:
+  # API routes
+  - match:
+    - uri:
+        prefix: /api/
+    route:
+    - destination:
+        host: nsboot
+        port:
+          number: 80
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,reset,connect-failure,refused-stream
+  
+  # WebSocket route
+  - match:
+    - uri:
+        prefix: /ws
+    route:
+    - destination:
+        host: nsboot
+        port:
+          number: 80
+    timeout: 7d
+    websocketUpgrade: true
+  
+  # Frontend routes
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: nsboot
+        port:
+          number: 80
+    timeout: 15s
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: nsboot
+  namespace: nsboot
+spec:
+  host: nsboot
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpCookie:
+          name: nsboot-session
+          ttl: 3600s
+    connectionPool:
+      tcp:
+        maxConnections: 1000
+      http:
+        http1MaxPendingRequests: 1000
+        http2MaxRequests: 1000
+        maxRequestsPerConnection: 2
+    outlierDetection:
+      consecutiveErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 50
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: nsboot
+  namespace: nsboot
+spec:
+  mtls:
+    mode: PERMISSIVE
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: nsboot-authz
+  namespace: nsboot
+spec:
+  selector:
+    matchLabels:
+      app: nsboot
+  action: ALLOW
+  rules:
+  # Allow health checks
+  - to:
+    - operation:
+        paths: ["/health", "/metrics"]
+  # Allow authentication endpoints
+  - to:
+    - operation:
+        paths: ["/api/auth/*"]
+  # Require JWT for other endpoints
+  - from:
+    - source:
+        requestPrincipals: ["*"]
+    to:
+    - operation:
+        paths: ["/api/*"]
+
+---
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: nsboot-telemetry
+  namespace: nsboot
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+    dimensions:
+      request_path:
+        value: request.path
+      response_code:
+        value: response.code
+  accessLogging:
+  - providers:
+    - name: envoy

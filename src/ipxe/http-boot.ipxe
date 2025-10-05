@@ -1,0 +1,159 @@
+#!ipxe
+###############################################################################
+# NSBoot HTTP Boot Configuration
+# Supports HTTP chainloading for faster boot times
+###############################################################################
+
+# Set console output
+console --picture --left 100 --right 80
+
+# Display banner
+echo
+echo ========================================
+echo NSBoot - HTTP Boot Mode
+echo ========================================
+echo
+
+# Get network configuration via DHCP
+dhcp || goto dhcp_failed
+
+# Display network info
+echo Network Configuration:
+echo   IP Address: ${ip}
+echo   Gateway: ${gateway}
+echo   DNS: ${dns}
+echo   Server: ${next-server}
+echo
+
+# Set HTTP server URL
+set http-server http://${next-server}
+
+# Detect architecture
+cpuid --ext 29 && set arch x86_64 || set arch i386
+echo Architecture: ${arch}
+echo
+
+# Detect boot mode
+iseq ${platform} efi && set boot-mode uefi || set boot-mode bios
+echo Boot Mode: ${boot-mode}
+echo
+
+# Get client MAC address
+set mac ${net0/mac}
+echo MAC Address: ${mac}
+echo
+
+# Try to get client configuration from server
+echo Fetching client configuration...
+chain ${http-server}/api/boot/config?mac=${mac} || goto no_config
+
+:no_config
+echo No specific configuration found, using defaults
+echo
+
+# Menu system
+:menu
+menu NSBoot - Select Boot Option
+item --gap -- Available Images:
+item windows10 Boot Windows 10
+item windows11 Boot Windows 11
+item ubuntu Boot Ubuntu 22.04
+item debian Boot Debian 12
+item --gap -- Options:
+item shell Drop to iPXE shell
+item reboot Reboot computer
+item exit Exit to BIOS
+choose --timeout 30000 --default windows10 selected || goto cancel
+goto ${selected}
+
+:windows10
+echo Booting Windows 10...
+set image windows10.vhdx
+goto boot_iscsi
+
+:windows11
+echo Booting Windows 11...
+set image windows11.vhdx
+goto boot_iscsi
+
+:ubuntu
+echo Booting Ubuntu 22.04...
+set image ubuntu-22.04.qcow2
+goto boot_iscsi
+
+:debian
+echo Booting Debian 12...
+set image debian-12.qcow2
+goto boot_iscsi
+
+:boot_iscsi
+# Set iSCSI target
+set iscsi-server ${next-server}
+set iscsi-port 3260
+set iscsi-target iqn.2025-01.com.nsboot:${mac}
+
+echo
+echo Connecting to iSCSI target...
+echo   Server: ${iscsi-server}:${iscsi-port}
+echo   Target: ${iscsi-target}
+echo   Image: ${image}
+echo
+
+# Connect to iSCSI target
+sanboot iscsi:${iscsi-server}:::${iscsi-port}:0:${iscsi-target} || goto iscsi_failed
+
+:boot_http
+# Alternative: Boot directly via HTTP (for ISO images)
+echo Booting via HTTP...
+kernel ${http-server}/images/${image}
+boot || goto boot_failed
+
+:shell
+echo Dropping to iPXE shell...
+echo Type 'exit' to return to menu
+shell
+goto menu
+
+:reboot
+reboot
+
+:exit
+exit
+
+:dhcp_failed
+echo
+echo ERROR: DHCP configuration failed
+echo
+echo Possible causes:
+echo   - No DHCP server on network
+echo   - Network cable unplugged
+echo   - Network interface disabled
+echo
+echo Press any key to retry...
+prompt
+goto dhcp
+
+:iscsi_failed
+echo
+echo ERROR: iSCSI connection failed
+echo
+echo Possible causes:
+echo   - iSCSI target not available
+echo   - Network connectivity issues
+echo   - Wrong target configuration
+echo
+echo Press any key to return to menu...
+prompt
+goto menu
+
+:boot_failed
+echo
+echo ERROR: Boot failed
+echo
+echo Press any key to return to menu...
+prompt
+goto menu
+
+:cancel
+echo Boot cancelled
+goto menu

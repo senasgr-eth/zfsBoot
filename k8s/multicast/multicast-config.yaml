@@ -1,0 +1,127 @@
+# Multicast Boot Configuration for NSBoot
+# Enables simultaneous boot of multiple clients using udpcast
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nsboot-multicast-config
+  namespace: nsboot
+data:
+  multicast.conf: |
+    # Multicast configuration
+    MULTICAST_ENABLED=true
+    MULTICAST_ADDRESS=239.255.0.1
+    MULTICAST_PORT=9000
+    MULTICAST_TTL=1
+    MULTICAST_RATE=100M
+    
+    # udpcast configuration
+    UDPCAST_INTERFACE=eth0
+    UDPCAST_MAX_BITRATE=1000000000  # 1 Gbps
+    UDPCAST_MIN_RECEIVERS=2
+    UDPCAST_MAX_WAIT=60
+    
+    # Image streaming
+    STREAM_BUFFER_SIZE=65536
+    STREAM_CHUNK_SIZE=1048576
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nsboot-multicast
+  namespace: nsboot
+spec:
+  type: ClusterIP
+  clusterIP: None  # Headless service
+  ports:
+  - name: multicast
+    port: 9000
+    protocol: UDP
+  selector:
+    app: nsboot
+    component: multicast
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nsboot-multicast-sender
+  namespace: nsboot
+spec:
+  selector:
+    matchLabels:
+      app: nsboot
+      component: multicast
+  template:
+    metadata:
+      labels:
+        app: nsboot
+        component: multicast
+    spec:
+      hostNetwork: true
+      containers:
+      - name: udpcast-sender
+        image: nsboot/nsboot:4.1.0
+        command:
+        - /bin/bash
+        - -c
+        - |
+          # Wait for image to stream
+          while true; do
+            if [ -f /tmp/stream-image ]; then
+              IMAGE=$(cat /tmp/stream-image)
+              echo "Streaming image: $IMAGE"
+              
+              # Stream via udpcast
+              udp-sender \
+                --file /srv/images/storages/$IMAGE \
+                --interface eth0 \
+                --mcast-data-address 239.255.0.1 \
+                --portbase 9000 \
+                --max-bitrate 1000000000 \
+                --min-receivers 2 \
+                --max-wait 60
+              
+              rm /tmp/stream-image
+            fi
+            sleep 5
+          done
+        volumeMounts:
+        - name: images
+          mountPath: /srv/images
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: images
+        persistentVolumeClaim:
+          claimName: nsboot-images
+      - name: tmp
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nsboot-ipxe-multicast
+  namespace: nsboot
+data:
+  multicast.ipxe: |
+    #!ipxe
+    
+    echo NSBoot - Multicast Boot Mode
+    echo
+    
+    # Get network config
+    dhcp
+    
+    # Join multicast group
+    echo Joining multicast group 239.255.0.1...
+    
+    # Receive image via udpcast
+    echo Receiving image via multicast...
+    
+    # Mount as iSCSI (after receiving)
+    set iscsi-target iqn.2025-01.com.nsboot:${net0/mac}
+    sanboot iscsi:${next-server}::::${iscsi-target}
