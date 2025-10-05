@@ -1,0 +1,430 @@
+openapi: 3.0.3
+info:
+  title: NSBoot API
+  description: |
+    RESTful API for NSBoot - Modern Diskless Boot System
+    
+    ## Authentication
+    Most endpoints require JWT authentication. Obtain a token via `/api/auth/login`.
+    
+    Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your-token>
+    ```
+  version: 4.1.0
+  contact:
+    name: NSBoot Team
+    url: https://github.com/vkornilyev1988/NSBoot-
+  license:
+    name: AGPL-3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.en.html
+
+servers:
+  - url: http://localhost/api
+    description: Local development server
+  - url: https://nsboot.example.com/api
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: System
+    description: System information and management
+  - name: Images
+    description: OS image management
+  - name: Clients
+    description: Client workstation management
+  - name: Snapshots
+    description: ZFS snapshot management
+  - name: Settings
+    description: System configuration
+
+paths:
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: User login
+      description: Authenticate user and receive JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: admin
+                password:
+                  type: string
+                  format: password
+                  example: admin
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  token:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                      role:
+                        type: string
+                  expires_in:
+                    type: integer
+        '401':
+          description: Invalid credentials
+          
+  /auth/refresh:
+    post:
+      tags: [Authentication]
+      summary: Refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed
+        '401':
+          description: Invalid token
+
+  /auth/logout:
+    post:
+      tags: [Authentication]
+      summary: User logout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+
+  /system/info:
+    get:
+      tags: [System]
+      summary: Get system information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: System information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                  hostname:
+                    type: string
+                  uptime:
+                    type: integer
+                  clients_online:
+                    type: integer
+                  total_images:
+                    type: integer
+                  total_snapshots:
+                    type: integer
+
+  /system/stats:
+    get:
+      tags: [System]
+      summary: Get system statistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: System statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cpu_usage:
+                    type: number
+                  memory_total:
+                    type: integer
+                  memory_used:
+                    type: integer
+                  disk_total:
+                    type: integer
+                  disk_used:
+                    type: integer
+
+  /images:
+    get:
+      tags: [Images]
+      summary: List all images
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of images
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Image'
+
+  /images/{id}:
+    delete:
+      tags: [Images]
+      summary: Delete an image
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Image deleted
+        '404':
+          description: Image not found
+
+  /images/{id}/snapshot:
+    post:
+      tags: [Images]
+      summary: Create snapshot of image
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: clean-install
+      responses:
+        '200':
+          description: Snapshot created
+
+  /clients:
+    get:
+      tags: [Clients]
+      summary: List all clients
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Client'
+
+  /clients/{mac}/wake:
+    post:
+      tags: [Clients]
+      summary: Wake client via WoL
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mac
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "00:11:22:33:44:55"
+      responses:
+        '200':
+          description: WoL packet sent
+
+  /snapshots:
+    get:
+      tags: [Snapshots]
+      summary: List all snapshots
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of snapshots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Snapshot'
+
+  /snapshots/{name}:
+    delete:
+      tags: [Snapshots]
+      summary: Delete snapshot
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Snapshot deleted
+
+  /snapshots/{name}/rollback:
+    post:
+      tags: [Snapshots]
+      summary: Rollback to snapshot
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rollback successful
+
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Get system settings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: System settings
+    post:
+      tags: [Settings]
+      summary: Update system settings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
+      responses:
+        '200':
+          description: Settings updated
+
+  /health:
+    get:
+      tags: [System]
+      summary: Health check
+      responses:
+        '200':
+          description: Service is healthy
+
+  /metrics:
+    get:
+      tags: [System]
+      summary: Prometheus metrics
+      responses:
+        '200':
+          description: Prometheus metrics in text format
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Image:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [iso, vhd, vhdx, qcow2, vmdk]
+        size:
+          type: integer
+        created:
+          type: string
+          format: date-time
+        in_use:
+          type: boolean
+        snapshots:
+          type: integer
+
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+        hostname:
+          type: string
+        mac_address:
+          type: string
+        ip_address:
+          type: string
+        status:
+          type: string
+          enum: [online, offline, booting]
+        image:
+          type: string
+        last_seen:
+          type: string
+          format: date-time
+
+    Snapshot:
+      type: object
+      properties:
+        name:
+          type: string
+        dataset:
+          type: string
+        created:
+          type: string
+          format: date-time
+        size:
+          type: string
+
+    Settings:
+      type: object
+      properties:
+        hostname:
+          type: string
+        server_ip:
+          type: string
+        dhcp_enabled:
+          type: boolean
+        zfs_compression:
+          type: string
+          enum: [off, lz4, gzip, zstd]
+
+security:
+  - bearerAuth: []

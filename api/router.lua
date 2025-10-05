@@ -3,11 +3,63 @@
 
 local api = require("api.init")
 local settings_api = require("api.settings")
+local auth = require("api.auth")
 
 local _M = {}
 
 -- Route table
 local routes = {
+    -- Authentication endpoints (no auth required)
+    ["POST /api/auth/login"] = function()
+        ngx.req.read_body()
+        local body = ngx.req.get_body_data()
+        
+        if not body then
+            api.error_response("Missing request body", 400)
+            return
+        end
+        
+        local ok, data = pcall(require("cjson").decode, body)
+        if not ok then
+            api.error_response("Invalid JSON", 400)
+            return
+        end
+        
+        local result = auth.login(data.username, data.password)
+        if result.success then
+            api.json_response(result)
+        else
+            api.error_response(result.message, 401)
+        end
+    end,
+    
+    ["POST /api/auth/refresh"] = function()
+        ngx.req.read_body()
+        local body = ngx.req.get_body_data()
+        
+        if not body then
+            api.error_response("Missing request body", 400)
+            return
+        end
+        
+        local ok, data = pcall(require("cjson").decode, body)
+        if not ok then
+            api.error_response("Invalid JSON", 400)
+            return
+        end
+        
+        local result = auth.refresh_token(data.token)
+        if result.success then
+            api.json_response(result)
+        else
+            api.error_response(result.message, 401)
+        end
+    end,
+    
+    ["POST /api/auth/logout"] = function()
+        local result = auth.logout()
+        api.json_response(result)
+    end,
     ["GET /api/system/info"] = function()
         local info = api.get_system_info()
         api.json_response(info)
