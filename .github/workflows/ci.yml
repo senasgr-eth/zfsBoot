@@ -241,17 +241,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/nsboot:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/nsboot:buildcache,mode=max
-      
-      - name: Tag and push Docker image
-        run: |
-          docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ env.DOCKER_IMAGE }}:latest
-          docker push ${{ env.DOCKER_IMAGE }}:latest
-          
-{{ ... }}
-            VERSION=${GITHUB_REF#refs/tags/}
-            docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ env.DOCKER_IMAGE }}:${VERSION}
-            docker push ${{ env.DOCKER_IMAGE }}:${VERSION}
-          fi
 
   build-docs:
     name: Build Documentation
