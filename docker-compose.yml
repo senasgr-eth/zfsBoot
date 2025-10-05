@@ -1,0 +1,157 @@
+version: '3.8'
+
+services:
+  nsboot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nsboot:4.1.0
+    container_name: nsboot-server
+    privileged: true  # Required for ZFS operations
+    network_mode: host  # Required for PXE/DHCP
+    restart: unless-stopped
+    
+    environment:
+      - TZ=UTC
+      - NSBOOT_ENV=production
+      - NSBOOT_LOG_LEVEL=info
+    
+    volumes:
+      # Persistent storage
+      - nsboot-images:/srv/images
+      - nsboot-tftp:/srv/tftp
+      - nsboot-logs:/var/log/nsboot
+      - nsboot-config:/srv/nsboot/cfg
+      
+      # ZFS access (if using host ZFS)
+      - /dev:/dev
+      - /lib/modules:/lib/modules:ro
+      
+      # Optional: Development mode - mount source code
+      # - ./bin:/opt/nsboot/bin
+      # - ./src:/opt/nsboot/src
+      # - ./frontend/dist:/opt/nsboot/frontend/dist
+    
+    ports:
+      - "80:80"
+      - "443:443"
+      - "67:67/udp"
+      - "69:69/udp"
+      - "3260:3260"
+      - "9100:9100"
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    labels:
+      - "com.nsboot.description=NSBoot Diskless Boot Server"
+      - "com.nsboot.version=4.1.0"
+
+  # Prometheus for monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nsboot-prometheus
+    restart: unless-stopped
+    
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    
+    ports:
+      - "9090:9090"
+    
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    
+    depends_on:
+      - nsboot
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nsboot-grafana
+    restart: unless-stopped
+    
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=nsboot_admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    
+    ports:
+      - "3000:3000"
+    
+    depends_on:
+      - prometheus
+
+  # Optional: Keycloak for OAuth2/OIDC authentication
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: nsboot-keycloak
+    restart: unless-stopped
+    
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/keycloak
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=keycloak
+      - KC_HOSTNAME=localhost
+    
+    command: start-dev
+    
+    ports:
+      - "8080:8080"
+    
+    depends_on:
+      - keycloak-db
+    
+    profiles:
+      - auth  # Only start with: docker-compose --profile auth up
+
+  keycloak-db:
+    image: postgres:15
+    container_name: nsboot-keycloak-db
+    restart: unless-stopped
+    
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=keycloak
+    
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+    
+    profiles:
+      - auth
+
+volumes:
+  nsboot-images:
+    driver: local
+  nsboot-tftp:
+    driver: local
+  nsboot-logs:
+    driver: local
+  nsboot-config:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  keycloak-db-data:
+    driver: local
+
+networks:
+  default:
+    name: nsboot-network

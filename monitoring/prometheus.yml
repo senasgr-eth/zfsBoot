@@ -1,0 +1,59 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'nsboot'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # NSBoot server metrics
+  - job_name: 'nsboot-server'
+    static_configs:
+      - targets: ['nsboot:9100']
+        labels:
+          service: 'nsboot'
+          component: 'server'
+  
+  # ZFS metrics (if zfs_exporter is running)
+  - job_name: 'zfs-exporter'
+    static_configs:
+      - targets: ['nsboot:9134']
+        labels:
+          service: 'nsboot'
+          component: 'zfs'
+  
+  # Nginx metrics (if nginx-prometheus-exporter is running)
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nsboot:9113']
+        labels:
+          service: 'nsboot'
+          component: 'nginx'
+  
+  # iSCSI target metrics (custom exporter)
+  - job_name: 'iscsi-target'
+    static_configs:
+      - targets: ['nsboot:9260']
+        labels:
+          service: 'nsboot'
+          component: 'iscsi'
+  
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'monitoring'
+          component: 'prometheus'

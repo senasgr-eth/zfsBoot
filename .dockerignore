@@ -1,0 +1,61 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# CI/CD
+.github/
+
+# Frontend development
+frontend/node_modules/
+frontend/src/
+frontend/public/
+frontend/*.json
+frontend/*.config.*
+frontend/.vscode/
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test/
+*.test.js
+*.spec.js
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+*.o
+*.so
+*.dylib
+
+# Docker
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile.*
+
+# Monitoring (included in image)
+# monitoring/
+
+# Scripts (included in image)
+# scripts/

@@ -1,0 +1,110 @@
+groups:
+  - name: nsboot_alerts
+    interval: 30s
+    rules:
+      # Disk space alerts
+      - alert: ZFSPoolHighUsage
+        expr: (zfs_pool_used_bytes / zfs_pool_size_bytes) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: zfs
+        annotations:
+          summary: "ZFS pool usage is high"
+          description: "ZFS pool {{ $labels.pool }} usage is {{ $value }}% (threshold: 80%)"
+      
+      - alert: ZFSPoolCriticalUsage
+        expr: (zfs_pool_used_bytes / zfs_pool_size_bytes) * 100 > 90
+        for: 2m
+        labels:
+          severity: critical
+          component: zfs
+        annotations:
+          summary: "ZFS pool usage is critical"
+          description: "ZFS pool {{ $labels.pool }} usage is {{ $value }}% (threshold: 90%)"
+      
+      # Boot failure alerts
+      - alert: HighBootFailureRate
+        expr: rate(nsboot_boot_failures_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: boot
+        annotations:
+          summary: "High boot failure rate detected"
+          description: "Boot failure rate is {{ $value }} failures/sec over the last 5 minutes"
+      
+      # iSCSI connection alerts
+      - alert: iSCSIConnectionDrops
+        expr: rate(nsboot_iscsi_disconnects_total[5m]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: iscsi
+        annotations:
+          summary: "High iSCSI disconnection rate"
+          description: "iSCSI disconnection rate is {{ $value }} disconnects/sec"
+      
+      # Service availability
+      - alert: NSBootServiceDown
+        expr: up{job="nsboot-server"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: server
+        annotations:
+          summary: "NSBoot service is down"
+          description: "NSBoot server has been down for more than 1 minute"
+      
+      - alert: NginxDown
+        expr: up{job="nginx"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: nginx
+        annotations:
+          summary: "Nginx is down"
+          description: "Nginx web server has been down for more than 1 minute"
+      
+      # Performance alerts
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+      
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }}% on {{ $labels.instance }}"
+      
+      # Network alerts
+      - alert: HighNetworkErrors
+        expr: rate(node_network_receive_errs_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "High network error rate"
+          description: "Network interface {{ $labels.device }} has {{ $value }} errors/sec"
+      
+      # Client count alerts
+      - alert: TooManyClients
+        expr: nsboot_active_clients > 100
+        for: 5m
+        labels:
+          severity: info
+          component: clients
+        annotations:
+          summary: "High number of active clients"
+          description: "{{ $value }} clients are currently active (consider scaling)"
