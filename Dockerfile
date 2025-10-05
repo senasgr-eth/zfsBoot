@@ -3,14 +3,14 @@ FROM node:20-alpine AS frontend-builder
 # Build frontend
 WORKDIR /build
 
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
+
 # Copy package files
 COPY frontend/package*.json ./
 
-# Install dependencies with increased timeout and retries
-RUN npm config set fetch-retries 5 && \
-    npm config set fetch-retry-mintimeout 20000 && \
-    npm config set fetch-retry-maxtimeout 120000 && \
-    npm install --verbose || npm install --verbose || npm install --legacy-peer-deps
+# Install dependencies
+RUN npm install --legacy-peer-deps --no-audit --no-fund
 
 # Copy source files
 COPY frontend/ ./
