@@ -1,0 +1,19 @@
+apiVersion: v2
+name: nsboot
+description: Modern Diskless Boot System - Helm Chart for Kubernetes
+type: application
+version: 4.1.0
+appVersion: "4.1.0"
+keywords:
+  - diskless
+  - boot
+  - pxe
+  - iscsi
+  - zfs
+home: https://github.com/vkornilyev1988/NSBoot-
+sources:
+  - https://github.com/vkornilyev1988/NSBoot-
+maintainers:
+  - name: NSBoot Team
+    email: nsboot@example.com
+icon: https://raw.githubusercontent.com/vkornilyev1988/NSBoot-/main/docs/logo.png

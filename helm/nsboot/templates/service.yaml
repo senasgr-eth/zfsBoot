@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "nsboot.fullname" . }}
+  labels:
+    {{- include "nsboot.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  - port: 443
+    targetPort: https
+    protocol: TCP
+    name: https
+  - port: 67
+    protocol: UDP
+    name: dhcp
+  - port: 69
+    protocol: UDP
+    name: tftp
+  - port: 3260
+    protocol: TCP
+    name: iscsi
+  {{- if .Values.monitoring.enabled }}
+  - port: 9100
+    protocol: TCP
+    name: metrics
+  {{- end }}
+  selector:
+    {{- include "nsboot.selectorLabels" . | nindent 4 }}

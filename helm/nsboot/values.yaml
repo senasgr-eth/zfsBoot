@@ -1,0 +1,185 @@
+# Default values for NSBoot Helm chart
+
+# Image configuration
+image:
+  repository: nsboot/nsboot
+  pullPolicy: IfNotPresent
+  tag: "4.1.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Replica count
+replicaCount: 1
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 33  # www-data
+
+# Container security context
+securityContext:
+  privileged: true  # Required for ZFS and network operations
+  capabilities:
+    add:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - NET_RAW
+
+# Service configuration
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 80
+  annotations: {}
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: nsboot.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: nsboot-tls
+  #    hosts:
+  #      - nsboot.example.com
+
+# Resource limits
+resources:
+  limits:
+    cpu: 4000m
+    memory: 16Gi
+  requests:
+    cpu: 2000m
+    memory: 8Gi
+
+# Autoscaling (disabled by default for diskless boot)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}
+
+# Persistence
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 500Gi
+  annotations: {}
+
+# ZFS configuration
+zfs:
+  enabled: true
+  poolName: nsboot0
+  compression: lz4
+  arcMax: 8  # GB
+
+# DHCP configuration
+dhcp:
+  enabled: true
+  rangeStart: "192.168.1.150"
+  rangeEnd: "192.168.1.200"
+  gateway: "192.168.1.1"
+  dns: "8.8.8.8, 8.8.4.4"
+
+# iSCSI configuration
+iscsi:
+  enabled: true
+  port: 3260
+  iqnPrefix: "iqn.2025-01.com.nsboot"
+
+# Monitoring
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+    port: 9100
+  grafana:
+    enabled: true
+    port: 3000
+    adminPassword: "nsboot_admin"
+
+# Authentication
+auth:
+  enabled: false
+  method: local  # local, oauth2, ldap
+  
+# OAuth2/OIDC (if auth.method = oauth2)
+oauth2:
+  enabled: false
+  issuerUrl: ""
+  clientId: ""
+  clientSecret: ""
+
+# Environment variables
+env:
+  - name: TZ
+    value: "UTC"
+  - name: NSBOOT_HOSTNAME
+    value: "nsboot-server"
+
+# Extra environment variables from secrets
+envFrom: []
+
+# Liveness probe
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Readiness probe
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Network policy
+networkPolicy:
+  enabled: false
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress: []
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+# Host network (required for PXE/DHCP)
+hostNetwork: true
+dnsPolicy: ClusterFirstWithHostNet

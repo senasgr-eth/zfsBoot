@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nsboot.fullname" . }}
+  labels:
+    {{- include "nsboot.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "nsboot.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nsboot.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "nsboot.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.hostNetwork }}
+      hostNetwork: true
+      dnsPolicy: {{ .Values.dnsPolicy }}
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: https
+          containerPort: 443
+          protocol: TCP
+        - name: dhcp
+          containerPort: 67
+          protocol: UDP
+        - name: tftp
+          containerPort: 69
+          protocol: UDP
+        - name: iscsi
+          containerPort: 3260
+          protocol: TCP
+        {{- if .Values.monitoring.enabled }}
+        - name: metrics
+          containerPort: 9100
+          protocol: TCP
+        {{- end }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe | nindent 12 }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe | nindent 12 }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        env:
+        {{- toYaml .Values.env | nindent 10 }}
+        - name: NSBOOT_ZFS_POOL
+          value: {{ .Values.zfs.poolName | quote }}
+        - name: NSBOOT_ZFS_COMPRESSION
+          value: {{ .Values.zfs.compression | quote }}
+        - name: NSBOOT_DHCP_ENABLED
+          value: {{ .Values.dhcp.enabled | quote }}
+        - name: NSBOOT_DHCP_RANGE_START
+          value: {{ .Values.dhcp.rangeStart | quote }}
+        - name: NSBOOT_DHCP_RANGE_END
+          value: {{ .Values.dhcp.rangeEnd | quote }}
+        {{- with .Values.envFrom }}
+        envFrom:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        volumeMounts:
+        - name: images
+          mountPath: /srv/images
+        - name: config
+          mountPath: /srv/nsboot/cfg
+        - name: logs
+          mountPath: /var/log/nsboot
+        {{- if .Values.zfs.enabled }}
+        - name: dev
+          mountPath: /dev
+        - name: modules
+          mountPath: /lib/modules
+          readOnly: true
+        {{- end }}
+      volumes:
+      - name: images
+        {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "nsboot.fullname" . }}-images
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+      - name: config
+        {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "nsboot.fullname" . }}-config
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+      - name: logs
+        emptyDir: {}
+      {{- if .Values.zfs.enabled }}
+      - name: dev
+        hostPath:
+          path: /dev
+      - name: modules
+        hostPath:
+          path: /lib/modules
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
